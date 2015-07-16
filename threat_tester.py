@@ -51,7 +51,7 @@ def main():
         logging.basicConfig(format='[%(levelname)-7s]:%(message)s', level=logging.ERROR)
     
     if options.caseid_prefix:
-        Tester.run(options.caseid_prefix)
+        engine.run(options.caseid_prefix)
         
     elif options.csv_file_path:
         arg = options.csv_file
