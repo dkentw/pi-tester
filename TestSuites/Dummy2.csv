@@ -1,0 +1,17 @@
+Prefix,TestCase ID,Title,Type,Run,Result,Log,Duration Time
+,Dummy2_0101,titile1,,1,Error,"Traceback (most recent call last):
+  File ""D:\inter_gitsource\pi-tester\Engine\TestEngine.py"", line 72, in _invoke_test_case
+    run_result, log_message = getattr(mod_class_inst, 'run')()
+  File ""D:\inter_gitsource\pi-tester\TestCases\Dummy2\Dummy2.py"", line 11, in run
+    mod.someone()
+AttributeError: 'str' object has no attribute 'someone'
+",0
+,Dummy2_0102,,,1,Fail,,1
+,Dummy2_0103,,,1,Pass,,0
+,Dummy2_0104,,,1,Fail,,0
+,Dummy2_0105,,,1,Fail,,0
+,Dummy2_0106,,,1,Fail,,0
+,Dummy2_0107,titileN,,1,Fail,,0
+,Dummy2_0108,,,1,Pass,The End,0
+,Dummy2_0109,,,,,,
+,Dummy2_0110,,,,,,

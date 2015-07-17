@@ -7,5 +7,6 @@ import TestEngine
 def GenerateTestCase(testCaseSuites, caseList, csvFileList):
     return TestEngine.GenerateTestCase(testCaseSuites, caseList, csvFileList)
 
-def run(caseID):
-    return TestEngine.run(caseID)
+
+def run(caseid_prefix):
+    return TestEngine.run(caseid_prefix)

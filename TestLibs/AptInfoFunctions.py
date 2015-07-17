@@ -6,7 +6,6 @@ Created on 2012/6/21
 Here place the libraries for testing APT Info Service
 '''
 import httplib
-import pycurl
 import base64
 import binascii
 import StringIO
