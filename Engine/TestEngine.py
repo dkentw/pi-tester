@@ -19,9 +19,9 @@ from reporter import Reporter
 from feedback import Feedback
    
 class Runner:
-    def __init__(self, args):
+    def __init__(self, source_csv):
         parser = TestCaseParser()
-        self.test_case_suites = parser.parse_from_csv(args)
+        self.test_case_suites = parser.parse_from_csv(source_csv)
         self.reporter = Reporter()
         self.feedback = Feedback()
         self.test_result = {}
