@@ -11,9 +11,6 @@ Release Log
 ### v1.0
 * first released
 
-Pi-Tester TMLS User Guide
-=========================
-wiki: http://coretech-backend-dev.tw.trendnet.org/wiki/Pi_tester_tmls#How_to_setup_fake_server
 
 Requirement Thirdpary Libraries
 ===============================
@@ -31,6 +28,4 @@ Folder Structure
 * TestLibs: Customized libraries for testing
 * Tools: External tools
 
-# User Guide
-http://coretech-backend-dev.tw.trendnet.org/wiki/Pi-Tester
 
