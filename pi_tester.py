@@ -4,11 +4,12 @@ import os, sys
 import logging
 import ConfigParser
 from optparse import OptionParser
+import datetime
+
 # customize
 import Engine.TestEngine as TestEngine
 import Engine.parser as Parser
 import Engine as engine
-
 
 LOGGING_LEVELS = {'critical': logging.CRITICAL,
                   'error': logging.ERROR,
@@ -52,6 +53,11 @@ def main():
                       dest="test_flag",
                       default=False, 
                       help="For develope use")
+    parser.add_option("-i", "--taskid", 
+                      action='store',
+                      type='string', 
+                      dest="task_id", 
+                      help="This id is for feedback, that also can be a identity of build number.")
     (options, args) = parser.parse_args()
 
     if options.debug_flag:
@@ -62,21 +68,27 @@ def main():
     else:
         logging.basicConfig(format='[%(levelname)-6s][%(name)s]:%(message)s', level=logging.WARN)
     
+    # -i
+    if options.task_id:
+        task_id = options.task_id
+    else:
+        dt = datetime.datetime.now()
+        task_id = dt.strftime('%Y%m%d%H%M%S') 
+    
     if options.caseid_prefix:
         # -c
-        runner = TestEngine.Runner(['all'])
+        runner = TestEngine.Runner(['all'], task_id)
         runner.run(options.caseid_prefix)     
     elif options.run_csv_path:
         # -s
-        runner = TestEngine.Runner(options.run_csv_path.split(','))   
+        runner = TestEngine.Runner(options.run_csv_path.split(','), task_id)   
         runner.run_all()
     elif options.csv_list:
         # -l
         with open(options.csv_list, 'rb') as fh:
-            for line in fh:
-                csv_path = os.path.join('TestSuites', line.rstrip('\r\n'))
-                runner = TestEngine.Runner([csv_path])   
-                runner.run_all()
+            csv_path = [ os.path.join('TestSuites', line.rstrip('\r\n')) for line in fh ]
+            runner = TestEngine.Runner(csv_path, task_id)   
+            runner.run_all()
         
     elif options.csv_file_path:
         # -g
@@ -90,7 +102,7 @@ def main():
         #Tester.GenerateTestCase(testCaseSuites, caseList, csvFileList)
     elif options.run_all_flag:
         # -a
-        runner = TestEngine.Runner(['all'])
+        runner = TestEngine.Runner(['all'], task_id)
         runner.run_all()
     else:
         parser.print_help()
