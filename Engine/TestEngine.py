@@ -19,25 +19,26 @@ from reporter import Reporter
 from feedback import Feedback
    
 class Runner:
-    def __init__(self, args):
+    def __init__(self, args, task_id=None):
         parser = TestCaseParser()
         self.test_case_suites = parser.parse_from_csv(args)
+        self.task_id = task_id
         self.reporter = Reporter()
-        self.feedback = Feedback()
-        self.test_result = {}
+        self.feedback = Feedback(task_id)
+        self.test_result = {}   # TODO: need add the task_id to trace the running status
         self.test_summary = {}
 
     def _save_csv_path(self, case_classify, csv_file_path):
         if self.test_result.has_key(case_classify):
             self.test_result[case_classify]['csv_file_path'] = csv_file_path
                 
-    def _save_result(self, case_classify, case_id, run_result, log_message, passed_num, failed_num, run_time):            
+    def _save_result(self, case_classify, case_id, run_result, log_message, passed_num, failed_num, error_num, run_time):            
         if run_result == True:
             run_result = 'Pass'
             passed_num += 1
         elif run_result == 'Error':
             run_result = 'Error'
-            failed_num += 1
+            error_num += 1
         else:
             run_result = 'Fail'
             failed_num += 1
@@ -50,23 +51,20 @@ class Runner:
         self.test_result[case_classify]['result'].update({ case_id: [str(run_result), log_message, str(run_time)] })
         logger.debug('Test Result: {0}'.format(str(run_result)))
             
-        return passed_num, failed_num
+        return passed_num, failed_num, error_num
     
-    def _save_summary(self, case_classify, ran_cases, passed_cases, failed_cases, total_run_time):
+    def _save_summary(self, case_classify, ran_cases, passed_cases, failed_cases, error_cases, total_run_time):
         if case_classify in self.test_result.keys():
             self.test_result[case_classify]['summary'] =  {
                                                             'ran_cases': ran_cases,
                                                             'passed_cases': passed_cases,
                                                             'failed_cases': failed_cases,
+                                                            'error_cases': error_cases,
                                                             'total_run_time': total_run_time 
                                                            }
         return True
     
     def _invoke_test_case(self, case_id):
-        '''
-        :returns: the test result, the log message, the running time
-        :rtype: string, string, string
-        '''
         start_time = time.time()
         try:
             case_classify = case_id.split('_')[0]
@@ -80,7 +78,6 @@ class Runner:
             result = (run_result, log_message, int(run_time))
         
         except:
-            test_result = False
             logger.error('[RUN] TestCases.{0}.{1}'.format(case_classify, case_id))
             logger.error(traceback.format_exc())
             end_time = time.time()
@@ -96,6 +93,7 @@ class Runner:
         run_count = 0
         passed_num = 0
         failed_num = 0
+        error_num = 0
         spec_case_id = '\w' if spec_case_id == '' else spec_case_id
         self.feedback.feedback_to_server(self.test_result)
         
@@ -116,7 +114,7 @@ class Runner:
                     continue
                 logger.debug('Pattern: {0}, Match case: {1}'.format(spec_case_id, case_id))
                 
-                # TestCaseSuites can control which case could be run 
+                # TestCaseSuites can control which case could be run                 
                 if case_run == '1':     # filter run = 0
                     run_count += 1                
                     try:
@@ -125,18 +123,18 @@ class Runner:
                         logger.error(traceback.format_exc())
                         continue
                     
-                    passed_num, failed_num = self._save_result(case_classify,
+                    passed_num, failed_num, error_num = self._save_result(case_classify,
                                                                case_id, 
                                                                run_result, 
                                                                log_message, 
-                                                               passed_num, failed_num,
+                                                               passed_num, failed_num, error_num,
                                                                run_time)
-                    total_run_time = total_run_time + run_time
+                    total_run_time += run_time
             else:
                 csv_file_path = self.test_case_suites[case_classify]['csv_file_path']          
                 self._save_csv_path(case_classify, csv_file_path)  # save csv_file_path in test_result  
-                self._save_summary(case_classify, run_count, passed_num, failed_num, total_run_time)
-                run_count = passed_num = failed_num = 0
+                self._save_summary(case_classify, run_count, passed_num, failed_num, error_num, total_run_time)
+                run_count = passed_num = failed_num = error_num = 0
     
         logger.debug('Test Result: %s' % str(self.test_result))
         

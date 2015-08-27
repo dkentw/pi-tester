@@ -8,10 +8,12 @@ import sys
 import time
 import pprint
 import logging
-import csv
-
 logger = logging.getLogger(__name__)
+import csv
+import shutil
+import pdb
 
+import pi_config
 
 class Reporter:
     def __init__(self):
@@ -21,7 +23,26 @@ class Reporter:
         self.failed_cases = 0
         self.html_template = ''
         self.report_create_time = 'XX'
+        self.reports_dir = ''
+        root_dir = os.getcwd()
+        self.current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.libs_dir = os.path.join(os.path.dirname(self.current_dir), 'Libs')
+        self.reports_root_dir = os.path.join(root_dir, pi_config.REPORTS_FOLDER)
+        self.latest_report_dir = os.path.join(self.reports_root_dir, 'latest')
         
+        if not os.path.exists(self.reports_root_dir):
+            os.mkdir(self.reports_root_dir)
+            
+        if not os.path.exists(self.latest_report_dir):
+            os.mkdir(self.latest_report_dir)
+        
+        self._clear_latest_report_folder()
+        
+    def _clear_latest_report_folder(self):
+        for file in os.listdir(self.latest_report_dir):
+            file_path = os.path.join(self.latest_report_dir, file)
+            os.remove(file_path)
+            
     def _create_html_head(self):
         html_head = ' \
             <meta charset="utf-8" /> \
@@ -29,8 +50,8 @@ class Reporter:
             <meta name="description" content="" /> \
             <meta name="author" content="kent chen" /> \
             <meta name="viewport" content="width=device-width; initial-scale=1.0" /> \
-            <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"> \
-            <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>'
+            <link href="bootstrap.min.css" rel="stylesheet"> \
+            <script src="bootstrap.min.js"></script>'
         return html_head
         
     def _create_summary_table(self, case_classify, test_summary):
@@ -67,17 +88,20 @@ class Reporter:
             </table>' % table_body_content
 
         return html_table
-    
+
+    def _create_report_folder(self):
+        self.reports_dir = os.path.join(self.reports_root_dir, self.report_create_time)
+
+        if not os.path.exists(self.reports_dir):
+            os.mkdir(self.reports_dir)
+
     def _create_report_file(self, filename, content):
-        root_dir = os.getcwd()
-        reports_dir = root_dir + '/Reports/' + self.report_create_time + '/'
-        report_file_name = reports_dir + filename + '.html'
-        
-        if not os.path.exists(reports_dir):
-            os.mkdir(reports_dir)
+        report_file_name = os.path.join(self.reports_dir, filename)
             
         with open(report_file_name, 'wb') as fh:
             fh.write(content)
+            
+        shutil.copy(report_file_name, self.latest_report_dir)
             
     def _generate_html_file(self, case_classify, test_result, test_summary):
         head = self._create_html_head()
@@ -106,18 +130,12 @@ class Reporter:
 </html>
         ''' % (style, case_classify, head, case_classify, summary_table, table)
         
-        root_dir = os.getcwd()
-        reports_root_dir = root_dir + '/Reports/'
-        reports_dir = reports_root_dir + self.report_create_time + '/'
-        report_file_name = reports_dir + case_classify + '.html'
-        
-        if not os.path.exists(reports_root_dir):
-            os.mkdir(reports_root_dir)
-        if not os.path.exists(reports_dir):
-            os.mkdir(reports_dir)
+        report_file_name = case_classify + '.html'
+                
+        self._create_report_file(report_file_name, html)
             
-        with open(report_file_name, 'wb') as fh:
-            fh.write(html)
+        #shutil.copy(report_file_name, latest_report_filename)
+        
             
     def _generate_summary_html_file(self, test_summary):
         summary_table = ''
@@ -161,29 +179,58 @@ class Reporter:
 </html>
         ''' % (style, head, html_table)
         
-        self._create_report_file('SummaryReport', html_code)
-                    
+        self._create_report_file('SummaryReport.html', html_code)
+
+    def _generate_bootstrap_lib(self):
+        """copy the bootstrap libraries into report folder
+        """
+        bootstrap_js = os.path.join(self.libs_dir, 'bootstrap.min.js')
+        bootstrap_css = os.path.join(self.libs_dir, 'bootstrap.min.css')
+        bootstrap_css_resp = os.path.join(self.libs_dir, 'bootstrap-responsive.min.css')
+
+        for file_path in [bootstrap_js, bootstrap_css, bootstrap_css_resp]:
+            shutil.copy(file_path, self.reports_dir)
+            shutil.copy(file_path, self.latest_report_dir)
+
     
     def _output_result_to_csv(self, test_result):
-        import shutil
+        """This function will write test result to CSV and generate the log file.
+        """
+        #TODO: Could be optimized for data structure
         csv_content = []
+        log_contents = []
         for case_classify in test_result.keys():
             csv_file_path = test_result[case_classify]['csv_file_path']
-            csv_file_path_backup = csv_file_path + '.backup' 
+            csv_file_path_backup = csv_file_path + '_' + self.report_create_time + '.backup' 
             shutil.copy(csv_file_path, csv_file_path_backup)
             
-            with open(test_result[case_classify]['csv_file_path'], 'rb') as fh:
+            with open(csv_file_path, 'rb') as fh:
                 csv_content = [row for row in csv.reader(fh, delimiter=',')]
                 
             for index, row in enumerate(csv_content):
                 if index != 0:
+                    if len(csv_content[index]) == 0:
+                        logger.warn('There is a empty line in CSV file')
+                        continue
                     case_id = csv_content[index][1]
                     if case_id in test_result[case_classify]['result'].keys():
-                        csv_content[index][5] = test_result[case_classify]['result'][case_id][0]
-                        csv_content[index][6] = test_result[case_classify]['result'][case_id][1]
-                        csv_content[index][7] = test_result[case_classify]['result'][case_id][2]
+                        csv_content[index][5] = test_result[case_classify]['result'][case_id][0]    # test result
+                        csv_content[index][7] = test_result[case_classify]['result'][case_id][2]    # run time
+                        if csv_content[index][5] == 'Error':
+                            log_contents.append([case_id, test_result[case_classify]['result'][case_id][1]]) # log
+                        else:
+                            csv_content[index][6] = test_result[case_classify]['result'][case_id][1]
             
-            with open(test_result[case_classify]['csv_file_path'], 'wb') as fh:
+            if len(log_contents) > 1:
+                latest_report_log_path = os.path.join(self.latest_report_dir, case_classify + '_log.txt')
+                with open(latest_report_log_path, 'wb') as log_f:
+                    for case_id, log_msg in log_contents:
+                        log_f.write('-'*80 + '\n')
+                        title = case_classify + ':' + case_id + '\n'
+                        log_f.write(title)
+                        log_f.write(log_msg + '\n')                    
+            
+            with open(csv_file_path, 'wb') as fh:
                 csv_writer = csv.writer(fh, delimiter=',')
                 try:
                     for row in csv_content:
@@ -192,14 +239,19 @@ class Reporter:
                 except:
                     logger.error('Output to csv file fail!')
     
+    def _output_log_to_file(self, test_result):
+        log_file_path = os.path.join(self.latest_report_dir, 'log.txt')
+        for case_classify in test_result.keys():
+            pprint.pprint(test_result[case_classify])
+            
     def _get_summary_dict(self, test_result):
         summary_dict = {}
         for classify in test_result:
             summary_dict[classify] = { 
-                                    "passed_cases": test_result[classify]['summary']['passed_cases'],
-                                    "failed_cases": test_result[classify]['summary']['failed_cases'],
-                                    "ran_cases": test_result[classify]['summary']['ran_cases']
-                                   }
+                "passed_cases": test_result[classify]['summary']['passed_cases'],
+                "failed_cases": test_result[classify]['summary']['failed_cases'],
+                "ran_cases": test_result[classify]['summary']['ran_cases']
+            }
             
         return summary_dict
         
@@ -210,8 +262,14 @@ class Reporter:
             print 
             summary_dict = self._get_summary_dict(test_result)
             self.report_create_time = str(time.strftime('%Y%m%d_%H%M%S', time.localtime()))
+
+            self._create_report_folder()
+            self._generate_bootstrap_lib()
+
             for case_classify in test_result.keys():
                 if test_result[case_classify].has_key('result'):
+                    pprint.pprint(test_result[case_classify])
+
                     # Generate HTML report
                     self._generate_html_file(case_classify, test_result[case_classify]['result'], test_result[case_classify]['summary'])
                 
@@ -221,9 +279,11 @@ class Reporter:
                     # Show in Console
                     print '{0} {1} {2}'.format('='*16, case_classify, '='*16)
                     test_case_result = test_result[case_classify]['result']
-                    for case_id in test_case_result.keys():                    
+                    keys = test_case_result.keys()
+                    keys.sort()
+                    for case_id in keys:                    
                         print '[{0}][{1}] {2}, {3}, {4}'.format(case_classify, case_id, test_case_result[case_id][0], test_case_result[case_id][1], str(test_case_result[case_id][2]))
                 
             self._generate_summary_html_file(summary_dict)
-            print '{0} {1} {2}'.format('='*16, 'Summary', '='*16)
+            print '=========== Summary ================'
             pprint.pprint(summary_dict)
