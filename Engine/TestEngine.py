@@ -22,11 +22,11 @@ logger = logging.getLogger('TestEngine')
 
 
 class Runner:
-    def __init__(self, source_csv):
+    def __init__(self, args, task_id=None):
         parser = TestCaseParser()
-        self.test_case_suites = parser.parse_from_csv(source_csv)
+        self.test_case_suites = parser.parse_from_csv(args)
         self.reporter = Reporter()
-        self.feedback = Feedback()
+        self.feedback = Feedback(task_id)
         self.test_result = {}
         self.test_summary = {}
 
@@ -214,4 +214,3 @@ def GenerateTestCase(test_case_suites):
         else:
             logging.warning('[GenerateTestCase] -The file is exist, it will not write template:')
             logging.warning('[GenerateTestCase] -{0}'.format(script_filename_path))
-
