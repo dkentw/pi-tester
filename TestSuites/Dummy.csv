@@ -1,11 +1,11 @@
 Prefix,TestCase ID,Title,Type,Run,Result,Log,Duration Time
-,Dummy_0101,,,1,Pass,call dummy api success,0
-,Dummy_0102,,,1,Pass,I Truly here.,5
-,Dummy_0103,,,1,Fail,"<img src=""http://www.pccillin.com.tw/sem/images/rightBtn.png"">",0
-,Dummy_0104,,,1,Fail,http://xxx.com.tw,0
-,Dummy_0105,,,1,Fail,,1
-,Dummy_0106,,,1,Fail,,0
-,Dummy_0107,,,1,Fail,,0
-,Dummy_0108,,,1,Fail,,0
+,Dummy_0101,,,0,,,
+,Dummy_0102,,,1,,,
+,Dummy_0103,,,1,,,
+,Dummy_0104,,,1,,,
+,Dummy_0105,,,1,,,
+,Dummy_0106,,,1,,,
+,Dummy_0107,,,1,,,
+,Dummy_0108,,,1,,,
 ,Dummy_0109,,,,,,
 ,Dummy_0110,,,,,,
