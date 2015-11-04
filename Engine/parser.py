@@ -115,15 +115,10 @@ class TestCaseParser:
         :return test_case_suite: 
         - test_case_suite: dict type, whole test case information
             Dummy: {
-                    csv_file_path: "<path>"
+                    csv_file_path: "<path>",
                     ordered_cases: [Dummy001, Dummy002],
-                    Dummy001: {
-                                run: 1
-                               }
-                    },
-                    Dummy002: {
-                                run: 0
-                               }
+                    Dummy001: { run: 1 },
+                    Dummy002: { run: 0 }
         '''
         logger.info('Start parsing the CSV file to test cases {0}'.format(test_case_suites))
         
@@ -136,6 +131,7 @@ class TestCaseParser:
             working_folder = os.getcwd()
             for csv_file_path_related in test_case_suites:
                 csv_files.append(os.path.join(working_folder, csv_file_path_related))
+            logger.info('get csv files: %s' % str(csv_files))
 
         # Parsing the CSV file
         test_case_suite = {}
@@ -148,12 +144,10 @@ class TestCaseParser:
                 logger.info('[ParseFromCSV] real_csv_files: {0}'.format(csv_file))
                         
                 csv_content = csv.reader(csv_file_fh, delimiter=',')
-                temp_list = []
                 if csv_content:
                     # Get the csv_content and handle it    
                     case_classify = os.path.basename(csv_file)[:-4]
                     test_case_suite.update( self._extract_test_cases(case_classify, csv_content, csv_file) )   
-
                 else:
                     logger.warning('[ParseFromCSV][{0}] is not a CSV file with comma'.format(csv_file))
         

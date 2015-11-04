@@ -214,3 +214,4 @@ def GenerateTestCase(test_case_suites):
         else:
             logging.warning('[GenerateTestCase] -The file is exist, it will not write template:')
             logging.warning('[GenerateTestCase] -{0}'.format(script_filename_path))
+

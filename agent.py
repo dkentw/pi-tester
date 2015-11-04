@@ -10,6 +10,9 @@ Options:
   -p --port        Port number
 """
 __VERSION__ = '1.0.1'
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('Agent')
 from optparse import OptionParser
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
@@ -21,6 +24,7 @@ from subprocess import PIPE
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
+
 #----Supported functions
 def exec_command_async(commands, shell_flag, cwd=None):
     try:
@@ -30,7 +34,10 @@ def exec_command_async(commands, shell_flag, cwd=None):
         result = e
     except ValueError as e:
         result = e
+    logger.info('[exec_command_async]: ' + str(result))
+    logger.info('[commands] %s' % str(commands))
     return result
+
 
 def exec_command_sync(commands, shell_flag, cwd=None):
     try:
@@ -40,27 +47,36 @@ def exec_command_sync(commands, shell_flag, cwd=None):
         output = e
     except ValueError as e:
         output = e
+
+    logger.info('[exec_command_sync]: ' + str(output))
+    logger.info('[commands] %s' % str(commands))
     return output
+
 
 def receive_file(data, filename, path):
     file_path = path + '/' + filename
     try:
         with open(file_path, 'wb') as fh:
             fh.write(data.data)
+        
+        logger.info('[receive_file]: %s, path:%s' % (filename, path))
         return True
     except:
+        logger.error('[receive_file]: %s, path:%s, failed!' % (filename, path))
         return False
-    
+
+
 def ping():
     return 'pong'
-    
-#-----------------------------------------------------------
 
+
+#-----------------------------------------------------------
 def create_server(server_ip, port):
     server_ip = socket.gethostbyname(socket.gethostname())
     server = SimpleXMLRPCServer((server_ip, int(port)), requestHandler=RequestHandler)
     server.register_introspection_functions()
     print "[INFO] The server IP is: " + server_ip
+    print "[INFO] The server Port is: " + port
 
     # register function
     server.register_function(exec_command_async, 'exec_command_async')
@@ -70,7 +86,8 @@ def create_server(server_ip, port):
 
     
     server.serve_forever()
-    
+
+
 def main():
     usage = "usage: %prog [options] arg1"
     parser = OptionParser(usage="usage: %prog [options][arg]")
