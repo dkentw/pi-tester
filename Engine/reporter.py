@@ -164,7 +164,7 @@ class Reporter:
             shutil.copy(csv_file_path, report_csv_file_path)
 
             with open(report_csv_file_path, 'rb') as fh:
-                csv_content = [row for row in csv.reader(fh, delimiter=',')]
+                csv_content = [row for row in csv.reader(fh, delimiter=',') if len(row) > 0]
 
             for index, row in enumerate(csv_content):
                 if index != 0:
