@@ -5,6 +5,7 @@ import sys
 import logging
 import ConfigParser
 from optparse import OptionParser
+import json
 # customize
 import Engine.TestEngine as TestEngine
 import Engine.parser as Parser
@@ -16,6 +17,19 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
                   'warning': logging.WARNING,
                   'info': logging.INFO,
                   'debug': logging.DEBUG}
+
+
+def parse_variable(variables):
+    variable_dict = {}
+    variable_list = variables.split(',')
+    for vairable in variable_list:
+        vairable_pair = vairable.split(':')
+        variable_dict.update({vairable_pair[0]: vairable_pair[1]})
+
+    with open('global_vars.py', 'wb') as f:
+        f.write('variables = ')
+        f.write(json.dumps(variable_dict))
+        f.close()
 
 
 def main():
@@ -54,7 +68,18 @@ def main():
                       dest="test_flag",
                       default=False,
                       help="For develope use")
+    parser.add_option("-v", "--variables",
+                      action='store',
+                      dest="variables",
+                      help="Variables with 'var1:AAA,var2:BBB'")
     (options, args) = parser.parse_args()
+
+    if options.variables:
+        parse_variable(options.variables)
+    else:
+        with open('global_vars.py', 'wb') as f:
+            f.write('')
+            f.close()
 
     if options.debug_flag:
         # -d
