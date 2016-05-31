@@ -22,7 +22,7 @@ logger = logging.getLogger('TestEngine')
 
 
 class Runner:
-    def __init__(self, args, task_id=None):
+    def __init__(self, args, task_id=None, xml_filename=None):
         parser = TestCaseParser()
         self.test_case_suites = parser.parse_from_csv(args)
         self.reporter = Reporter()

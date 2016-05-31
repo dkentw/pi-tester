@@ -68,6 +68,10 @@ def main():
                       dest="test_flag",
                       default=False,
                       help="For develope use")
+    parser.add_option("-x", "--xml",
+                      action='store',
+                      dest="xml_filename",
+                      help="Output the xml file with junit xml format.")
     parser.add_option("-v", "--variables",
                       action='store',
                       dest="variables",
@@ -91,11 +95,11 @@ def main():
 
     if options.caseid_prefix:
         # -c
-        runner = TestEngine.Runner(['all'])
+        runner = TestEngine.Runner(['all'], options.xml_filename)
         runner.run(options.caseid_prefix)
     elif options.run_csv_path:
         # -s
-        runner = TestEngine.Runner(options.run_csv_path.split(','))
+        runner = TestEngine.Runner(options.run_csv_path.split(','), options.xml_filename)
         runner.run_all()
     elif options.csv_list:
         # -l

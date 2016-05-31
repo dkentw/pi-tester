@@ -10,11 +10,13 @@ import pprint
 import logging
 import csv
 
+from junit_xml import TestSuite, TestCase
+
 logger = logging.getLogger(__name__)
 
 
 class Reporter:
-    def __init__(self):
+    def __init__(self, xml_filename=None):
         self.summary = {}
         self.ran_cases = 0
         self.passed_cases = 0
@@ -23,6 +25,7 @@ class Reporter:
         self.report_create_time = 'XX'
         self.reports_dir = os.getcwd() + '/Reports/'
         self.latest_reports_dir = os.path.join(self.reports_dir, 'Latest')
+        self.xml_filename = None if xml_filename is None else xml_filename
 
     def _create_html_head(self):
         html_head = ' \
@@ -194,14 +197,17 @@ class Reporter:
 
         return summary_dict
 
-    def output_report(self, test_result):
+    def _output_normal(self, test_result):
+        # Need refactor
         if test_result == {}:
             print '[what?!] there are not any test result, what is the test case id?'
         else:
             print
+            xml_test_suites = []
             summary_dict = self._get_summary_dict(test_result)
             self.report_create_time = str(time.strftime('%Y%m%d_%H%M%S', time.localtime()))
             for case_classify in test_result.keys():
+                xml_test_cases = []
                 if 'result' in test_result[case_classify].keys():
                     # Generate HTML report
                     self._generate_html_file(
@@ -220,6 +226,19 @@ class Reporter:
                                                                 test_case_result[case_id][1],
                                                                 str(test_case_result[case_id][2]))
 
+                        # Produce xml file
+                        test_case = TestCase(case_id, case_classify, int(test_case_result[case_id][2]))
+                        if test_case_result[case_id][0] == 'Fail' or test_case_result[case_id][0] == 'Error':
+                            test_case.add_failure_info('msg' + test_case_result[case_id][1])
+                        xml_test_cases.append(test_case)
+
+                    xml_test_suites.append(TestSuite(case_classify, xml_test_cases))
+                    with open(os.path.join(self.latest_reports_dir, case_classify + '.xml'), 'w') as f:
+                        TestSuite.to_file(f, xml_test_suites, prettyprint=True)
+
             self._generate_summary_html_file(summary_dict)
             print '{0} {1} {2}'.format('='*16, 'Summary', '='*16)
             pprint.pprint(summary_dict)
+
+    def output_report(self, test_result):
+        self._output_normal(test_result)

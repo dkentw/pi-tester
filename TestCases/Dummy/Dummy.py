@@ -84,7 +84,7 @@ class Dummy_0107:
         pass
 
     def run(self):
-        return False, ''
+        return True, ''
 
 
 class Dummy_0108:
