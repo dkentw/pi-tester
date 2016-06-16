@@ -229,7 +229,11 @@ class Reporter:
                         # Produce xml file
                         test_case = TestCase(case_id, case_classify, int(test_case_result[case_id][2]))
                         if test_case_result[case_id][0] == 'Fail' or test_case_result[case_id][0] == 'Error':
-                            test_case.add_failure_info('msg' + test_case_result[case_id][1])
+                            try:
+                                test_case.add_failure_info('msg' + test_case_result[case_id][1])
+                            except:
+                                test_case.add_failure_info('msg' + str(test_case_result[case_id]))
+
                         xml_test_cases.append(test_case)
 
                     xml_test_suites.append(TestSuite(case_classify, xml_test_cases))
