@@ -27,7 +27,7 @@ $ touch Dummy.py
 
 ```bash
 # Execute a test case by test case ID
-python pi_tester.py -c Dummy_0101$
+python pi_tester.py -c Dummy_0102$
 
 # Execute test cases by test suit
 python pi_tester.py -s TestSuites/Dummy.csv
