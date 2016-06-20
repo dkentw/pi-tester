@@ -6,10 +6,13 @@ import logging
 import ConfigParser
 from optparse import OptionParser
 import json
+import re
+
 # customize
 import Engine.TestEngine as TestEngine
 import Engine.parser as Parser
 import Engine as engine
+from Engine.config import VariablesPool
 
 
 LOGGING_LEVELS = {'critical': logging.CRITICAL,
@@ -20,16 +23,16 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
 
 
 def parse_variable(variables):
-    variable_dict = {}
-    variable_list = variables.split(',')
-    for vairable in variable_list:
-        vairable_pair = vairable.split(':')
-        variable_dict.update({vairable_pair[0]: vairable_pair[1]})
+    if re.search('^\w+\:\w+,{0,1}', variables):
+        variable_dict = {}
+        variable_list = variables.split(',')
 
-    with open('global_vars.py', 'wb') as f:
-        f.write('variables = ')
-        f.write(json.dumps(variable_dict))
-        f.close()
+        for vairable in variable_list:
+            vairable_pair = vairable.split(':')
+            variable_dict.update({vairable_pair[0]: vairable_pair[1]})
+            setattr(VariablesPool, vairable_pair[0], vairable_pair[1])
+    else:
+        raise Exception('The format of the string to variable is wrong.')
 
 
 def main():
@@ -80,10 +83,6 @@ def main():
 
     if options.variables:
         parse_variable(options.variables)
-    else:
-        with open('global_vars.py', 'wb') as f:
-            f.write('')
-            f.close()
 
     if options.debug_flag:
         # -d

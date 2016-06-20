@@ -35,10 +35,12 @@ class Dummy_0103:
     '''
 
     def __init__(self):
+        self.var1 = 'one'   # this variable can be replaced by "-v var1:123"
+        self.var2 = 'two'
         pass
 
     def run(self):
-        return False, '<img src="http://www.pccillin.com.tw/sem/images/rightBtn.png">'
+        return False, '<img src="http://www.pccillin.com.tw/sem/images/rightBtn.png">: %s, %s' % (self.var1, self.var2)
 
 
 class Dummy_0104:

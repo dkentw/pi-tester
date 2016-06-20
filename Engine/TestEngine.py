@@ -70,6 +70,12 @@ class Runner:
                                                         }
         return True
 
+    def _replace_attribue_with_vaiablespool(self, obj):
+        from Engine.config import VariablesPool
+        for key in VariablesPool.__dict__.keys():
+            if not re.match(r'_{2}', key):
+                setattr(obj, key, getattr(VariablesPool, key))
+
     def _invoke_test_case(self, case_id):
         '''
         :returns: the test result, the log message, the running time
@@ -81,6 +87,7 @@ class Runner:
             mod = __import__('TestCases.{0}.{0}'.format(case_classify), fromlist=[case_id])
             mod_class = getattr(mod, case_id)
             mod_class_inst = mod_class()
+            self._replace_attribue_with_vaiablespool(mod_class_inst)
             run_result, log_message = getattr(mod_class_inst, 'run')()
             logger.debug('Run test case: {0}.{1}'.format(case_classify, case_id))
             end_time = time.time()
