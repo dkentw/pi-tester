@@ -92,7 +92,11 @@ def main():
     else:
         logging.basicConfig(format='[%(levelname)-6s][%(name)s]:%(message)s', level=logging.WARN)
 
-    if options.caseid_prefix:
+    if options.caseid_prefix and options.run_csv_path:
+        # -c -s
+        runner = TestEngine.Runner(options.run_csv_path.split(','), options.xml_filename)
+        runner.run(options.caseid_prefix)
+    elif options.caseid_prefix:
         # -c
         runner = TestEngine.Runner(['all'], options.xml_filename)
         runner.run(options.caseid_prefix)
