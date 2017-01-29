@@ -1,14 +1,9 @@
 #!/usr/bin/python
-# built-in
 import os
-import sys
 import logging
-import ConfigParser
 from optparse import OptionParser
-import json
 import re
 
-# customize
 import Engine.TestEngine as TestEngine
 import Engine.parser as Parser
 import Engine as engine

@@ -3,3 +3,6 @@
 .project
 .pydevproject
 Reports/**
+build/
+dist/
+Pi_Tester.egg-info/
