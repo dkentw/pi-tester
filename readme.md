@@ -1,18 +1,25 @@
 
 
+# Installation
+```bash
+python setup.py install
+```
+
+# Usage
+```bash
+$ pitester -h
+
+# run a testsuite with a csv file
+$ pitester -s testsuite.csv
+
+# run a specific test case
+$ pitester -c Dummy_0101
+```
 
 # Create A Test Case
 
-### 1. create a test suite in TestSuites/ folder
-
-```bash
-$ cd TestSuites
-$ touch Dummy.csv
-```
-
-### 2. Refer the sample file in TestSuites/ folder to create the coloumn and data.
-
-### 3. Create a folder for test cases in TestCases/
+### 1. Create a directory for test cases
+The name(Dummy) of the directory must the same as the name of test script(Dummy.py)
 
 ```bash
 $ mkdir Dummy
@@ -20,15 +27,15 @@ $ cd Dummy
 $ touch Dummy.py
 ```
 
-### 4. Writ down the test script in the py file.
+### 2. Writ down the test script in the py file.
+```python
+class Dummy_0101:
+    '''
+    write doc here
+    '''
+    def __init__(self):
+        pass
 
-
-# Run Test Case
-
-```bash
-# Execute a test case by test case ID
-python pi_tester.py -c Dummy_0102$
-
-# Execute test cases by test suit
-python pi_tester.py -s TestSuites/Dummy.csv
+    def run(self):
+        return True, 'call dummy api success'
 ```
