@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="Pitester",
+    name="pi-tester",
     version="1.0.0",
     # package_dir={'': 'src'},
     packages=['Engine'],
@@ -12,7 +12,7 @@ setup(
     package_data={},
     entry_points={
         'console_scripts': [
-            'pitester = pitester:main'
+            'pitester=pitester:main'
         ]
     },
     py_modules=['pitester'],

@@ -120,8 +120,7 @@ def main():
         runner = TestEngine.Runner(['all'])
         runner.run_all()
     else:
-        print('---' * 80)
-        print(os.getcwd())
+
         parser.print_help()
 
 
