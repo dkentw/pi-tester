@@ -1,4 +1,3 @@
-import sys
 import logging
 import traceback
 import json
@@ -11,7 +10,7 @@ logger = logging.getLogger('Feedback')
 
 class Feedback:
     def __init__(self, task_id):
-        from pi_config import FEEDBACK_SERVER
+        from config import FEEDBACK_SERVER
 
         self.task_id = task_id
         self.server_url = FEEDBACK_SERVER['server_url']
@@ -19,6 +18,7 @@ class Feedback:
         self.status_url = self.server_url + FEEDBACK_SERVER['status_path']
         self.hostname = socket.gethostname()
         try:
+            _ = urllib2.urlopen(self.server_url, timeout=1)
             self.server_down = False
         except:
             logger.warn('It can not connect to feedback server!')

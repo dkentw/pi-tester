@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<testsuites errors="0" failures="5" tests="7" time="6.0">
+	<testsuite errors="0" failures="5" name="Dummy" skipped="0" tests="7" time="6">
+		<testcase classname="Dummy" name="Dummy_0102" time="5.000000"/>
+		<testcase classname="Dummy" name="Dummy_0103">
+			<failure message="msg&lt;img src=&quot;http://www.pccillin.com.tw/sem/images/rightBtn.png&quot;&gt;: one, two" type="failure"/>
+		</testcase>
+		<testcase classname="Dummy" name="Dummy_0104">
+			<failure message="msghttp://xxx.com.tw" type="failure"/>
+		</testcase>
+		<testcase classname="Dummy" name="Dummy_0105" time="1.000000">
+			<failure message="msg" type="failure"/>
+		</testcase>
+		<testcase classname="Dummy" name="Dummy_0106">
+			<failure message="msg" type="failure"/>
+		</testcase>
+		<testcase classname="Dummy" name="Dummy_0107"/>
+		<testcase classname="Dummy" name="Dummy_0108">
+			<failure message="msg" type="failure"/>
+		</testcase>
+	</testsuite>
+</testsuites>

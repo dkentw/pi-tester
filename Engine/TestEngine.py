@@ -6,13 +6,9 @@ Created on 2012/6/24
 import os
 import re
 import logging
-
-import csv
-import sys
-import pprint
-import json
 import traceback
 import time
+from importlib import import_module
 
 from parser import TestCaseParser
 from reporter import Reporter
@@ -84,7 +80,8 @@ class Runner:
         start_time = time.time()
         try:
             case_classify = case_id.split('_')[0]
-            mod = __import__('{0}.{0}'.format(case_classify), fromlist=[case_id])
+            # mod = __import__('{0}.{0}'.format(case_classify), fromlist=[case_id])
+            mod = import_module('{0}.{0}'.format(case_classify))
             mod_class = getattr(mod, case_id)
             mod_class_inst = mod_class()
             self._replace_attribue_with_vaiablespool(mod_class_inst)
@@ -96,6 +93,7 @@ class Runner:
 
         except:
             logger.error('[RUN] {0}.{1}'.format(case_classify, case_id))
+            logger.error('working directory: {0}'.format(os.getcwd()))
             logger.error(traceback.format_exc())
             end_time = time.time()
             run_time = end_time - start_time

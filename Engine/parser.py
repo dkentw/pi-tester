@@ -4,12 +4,9 @@ Created on 2012/6/24
 @author: kent
 '''
 import os
-import re
 import logging
 import csv
 import sys
-import pprint
-import json
 import traceback
 
 logger = logging.getLogger('Parser')

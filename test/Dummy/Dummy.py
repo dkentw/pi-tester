@@ -1,7 +1,4 @@
-import TestLibs.DummyAPI as dummyapi
 import time
-
-import global_vars
 
 
 class Dummy_0101:
@@ -12,7 +9,6 @@ class Dummy_0101:
         pass
 
     def run(self):
-        dummyapi.call_dummy()
         return True, 'call dummy api success'
 
 
@@ -26,7 +22,7 @@ class Dummy_0102:
 
     def run(self):
         time.sleep(5)
-        return True, global_vars.variables
+        return True, 'N/A'
 
 
 class Dummy_0103:

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import sys
 import logging
 from optparse import OptionParser
 import re
@@ -31,6 +32,7 @@ def parse_variable(variables):
 
 
 def main():
+    sys.path.append(os.getcwd())
     parser = OptionParser(usage="usage: %prog [options][arg]")
     parser.add_option('-d', '--debug',
                       action='store',
