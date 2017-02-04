@@ -1,0 +1,2 @@
+docutils>=0.3
+junit-xml>=1.7

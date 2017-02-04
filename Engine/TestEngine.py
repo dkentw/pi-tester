@@ -22,9 +22,9 @@ logger = logging.getLogger('TestEngine')
 
 
 class Runner:
-    def __init__(self, args, task_id=None, xml_filename=None):
+    def __init__(self, test_suites, task_id=None, xml_filename=None):
         parser = TestCaseParser()
-        self.test_case_suites = parser.parse_from_csv(args)
+        self.test_suites = parser.parse_from_csv(test_suites)
         self.reporter = Reporter()
         self.feedback = Feedback(task_id)
         self.test_result = {}
@@ -63,11 +63,11 @@ class Runner:
     def _store_summary(self, case_classify, ran_cases, passed_cases, failed_cases, total_run_time):
         if case_classify in self.test_result.keys():
             self.test_result[case_classify]['summary'] = {
-                                                            'ran_cases': ran_cases,
-                                                            'passed_cases': passed_cases,
-                                                            'failed_cases': failed_cases,
-                                                            'total_run_time': total_run_time
-                                                        }
+                'ran_cases': ran_cases,
+                'passed_cases': passed_cases,
+                'failed_cases': failed_cases,
+                'total_run_time': total_run_time
+            }
         return True
 
     def _replace_attribue_with_vaiablespool(self, obj):
@@ -84,7 +84,7 @@ class Runner:
         start_time = time.time()
         try:
             case_classify = case_id.split('_')[0]
-            mod = __import__('TestCases.{0}.{0}'.format(case_classify), fromlist=[case_id])
+            mod = __import__('{0}.{0}'.format(case_classify), fromlist=[case_id])
             mod_class = getattr(mod, case_id)
             mod_class_inst = mod_class()
             self._replace_attribue_with_vaiablespool(mod_class_inst)
@@ -95,8 +95,7 @@ class Runner:
             result = (run_result, log_message, int(run_time))
 
         except:
-            test_result = False
-            logger.error('[RUN] TestCases.{0}.{1}'.format(case_classify, case_id))
+            logger.error('[RUN] {0}.{1}'.format(case_classify, case_id))
             logger.error(traceback.format_exc())
             end_time = time.time()
             run_time = end_time - start_time
@@ -107,32 +106,32 @@ class Runner:
     def run_all(self):
         self.run('.*')
 
-    def run(self, spec_case_id):
+    def run(self, specific_case_id):
         run_count = 0
         passed_num = 0
         failed_num = 0
-        spec_case_id = '\w' if spec_case_id == '' else spec_case_id
+        specific_case_id = '\w' if specific_case_id == '' else specific_case_id
         self.feedback.feedback_to_server(self.test_result)  # this can initial feedback server.
 
-        if self.test_case_suites is False:
+        if self.test_suites is False:
             return
-        for case_classify in self.test_case_suites.keys():
+        for case_classify in self.test_suites.keys():
             if case_classify is None:
                 logger.error('Found a None case_classify!')
                 continue
 
             total_run_time = 0
-            for case_id in self.test_case_suites[case_classify]['ordered_cases']:
-                case_run = self.test_case_suites[case_classify][case_id]['run']
+            for case_id in self.test_suites[case_classify]['ordered_cases']:
                 # CaseID can support REGEX
-                pattern = re.compile(spec_case_id)
+                pattern = re.compile(specific_case_id)
                 re_result = pattern.search(case_id)
-                if re_result is None:           # skip test case
+                if re_result is None:  # skip test case
                     continue
-                logger.debug('Pattern: {0}, Match case: {1}'.format(spec_case_id, case_id))
+                logger.debug('Pattern: {0}, Match case: {1}'.format(specific_case_id, case_id))
 
-                # TestCaseSuites can control which case could be run
-                if case_run == '1':     # filter run = 0
+                # CSV can control which case could be run
+                runable = self.test_suites[case_classify][case_id]['run']
+                if runable == '1':     # filter run = 0
                     run_count += 1
                     try:
                         run_result, log_message, run_time = self._invoke_test_case(case_id)
@@ -148,7 +147,7 @@ class Runner:
                                                                 run_time)
                     total_run_time = total_run_time + run_time
             else:
-                csv_file_path = self.test_case_suites[case_classify]['csv_file_path']
+                csv_file_path = self.test_suites[case_classify]['csv_file_path']
                 self._store_csv_path(case_classify, csv_file_path)  # save csv_file_path in test_result
                 self._store_summary(case_classify, run_count, passed_num, failed_num, total_run_time)
                 run_count = passed_num = failed_num = 0
@@ -185,9 +184,9 @@ class {0}:
         fh.close()
 
 
-def GenerateTestCase(test_case_suites):
+def GenerateTestCase(test_suites):
     working_folder = os.getcwd()
-    test_cases_dir = {'top_level': os.path.join(working_folder, 'TestCases')}
+    test_cases_dir = {'top_level': working_folder}
     init_file = os.path.join(test_cases_dir['top_level'], '__init__.py')
 
     if not os.path.exists(init_file):
@@ -197,8 +196,8 @@ def GenerateTestCase(test_case_suites):
     else:
         logging.info('[GenerateTestCase] The ini file is exist: {0}'.format(init_file))
 
-    for case_classify in test_case_suites:
-        file_path = test_case_suites[case_classify]['csv_file_path']
+    for case_classify in test_suites:
+        file_path = test_suites[case_classify]['csv_file_path']
         file_name = os.path.basename(file_path)
         file_name_no_ext = file_name.split('.')[0]
         test_cases_dir['layer2'] = os.path.join(test_cases_dir['top_level'], file_name_no_ext)
@@ -217,7 +216,7 @@ def GenerateTestCase(test_case_suites):
             logger.info('[GenerateTestCase] create file {0}'.format(init_file))
             fh.close()
 
-            _write_template(script_filename_path, test_case_suites[case_classify]['ordered_cases'])
+            _write_template(script_filename_path, test_suites[case_classify]['ordered_cases'])
         else:
             logging.warning('[GenerateTestCase] -The file is exist, it will not write template:')
             logging.warning('[GenerateTestCase] -{0}'.format(script_filename_path))
