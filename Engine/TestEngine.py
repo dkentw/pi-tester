@@ -18,9 +18,9 @@ logger = logging.getLogger('TestEngine')
 
 
 class Runner:
-    def __init__(self, test_suites, task_id=None, xml_filename=None):
+    def __init__(self, test_suite_csv=None, task_id=None, xml_filename=None):
         parser = TestCaseParser()
-        self.test_suites = parser.parse_from_csv(test_suites)
+        self.test_suites = parser.parse_from_csv(test_suite_csv)
         self.reporter = Reporter()
         self.feedback = Feedback(task_id)
         self.test_result = {}
@@ -41,9 +41,11 @@ class Runner:
         elif run_result == 'Error':
             run_result = 'Error'
             failed_num += 1
-        else:
-            run_result = 'Fail'
+        elif run_result is False:
             failed_num += 1
+        else:
+            # this include "not run" case
+            pass
 
         if case_classify not in self.test_result.keys():
             self.test_result[case_classify] = {}
@@ -144,6 +146,9 @@ class Runner:
                                                                 passed_num, failed_num,
                                                                 run_time)
                     total_run_time = total_run_time + run_time
+                else:
+                    self._store_result(case_classify, case_id, 'N/A', '', 0, 0, 0)
+
             else:
                 csv_file_path = self.test_suites[case_classify]['csv_file_path']
                 self._store_csv_path(case_classify, csv_file_path)  # save csv_file_path in test_result

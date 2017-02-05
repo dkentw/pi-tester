@@ -48,7 +48,7 @@ def main():
                       action='store',
                       type='string',
                       dest="run_csv_path",
-                      help="Run all test case in the specific csv file.")
+                      help="Run all test case in a specific csv file.")
     parser.add_option('-l', '--csvlist',
                       action='store',
                       type='string',
@@ -91,18 +91,18 @@ def main():
 
     if options.caseid_prefix:
         # -c
-        runner = TestEngine.Runner(['all'], options.xml_filename)
+        runner = TestEngine.Runner(xml_filename=options.xml_filename)
         runner.run(options.caseid_prefix)
     elif options.run_csv_path:
         # -s
-        runner = TestEngine.Runner(options.run_csv_path.split(','), options.xml_filename)
+        runner = TestEngine.Runner(test_suite_csv=options.run_csv_path, xml_filename=options.xml_filename)
         runner.run_all()
     elif options.csv_list:
         # -l
         with open(options.csv_list, 'rb') as fh:
             for line in fh:
-                csv_path = os.path.join('TestSuites', line.rstrip('\r\n'))
-                runner = TestEngine.Runner([csv_path])
+                run_csv_path = line.rstrip('\r\n')
+                runner = TestEngine.Runner(test_suite_csv=run_csv_path, xml_filename=options.xml_filename)
                 runner.run_all()
 
     elif options.csv_file_path:
@@ -120,7 +120,6 @@ def main():
         runner = TestEngine.Runner(['all'])
         runner.run_all()
     else:
-
         parser.print_help()
 
 

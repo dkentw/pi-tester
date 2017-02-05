@@ -2,7 +2,7 @@
 *.swp
 .project
 .pydevproject
-Reports/**
 build/
 dist/
-Pi_Tester.egg-info/
+pitester.egg-info/
+/test/Reports/

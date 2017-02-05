@@ -12,7 +12,7 @@ import csv
 
 from junit_xml import TestSuite, TestCase
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Reporter')
 
 
 class Reporter:
@@ -202,7 +202,6 @@ class Reporter:
         if test_result == {}:
             print '[what?!] there are not any test result, what is the test case id?'
         else:
-            print
             xml_test_suites = []
             summary_dict = self._get_summary_dict(test_result)
             self.report_create_time = str(time.strftime('%Y%m%d_%H%M%S', time.localtime()))

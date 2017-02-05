@@ -49,7 +49,7 @@ def get_csv_files():
     #     else:
     #         csvFilePaths.append(entry1PathName)
 
-    logger.info('[ParseFromCSV] CSV file list: {0}'.format(csv_files_path))
+    logger.info('[get_csv_files] CSV file list: {0}'.format(str(csv_files_path)))
     return csv_files_path
 
 
@@ -82,6 +82,7 @@ class TestCaseParser:
 
                 return result
         except IOError:
+            logger.error(traceback.print_exc())
             logger.error('Fail to open file!')
             return False
         except:
@@ -142,9 +143,11 @@ class TestCaseParser:
         if test_suites is None:
             csv_files = get_csv_files()
             logger.info('get csv files: %s' % str(csv_files))
-        else:
-            # if test_suites is a list
+        elif type(test_suites) == list:
             csv_files = test_suites
+            logger.info('get csv files: %s' % str(csv_files))
+        else:
+            csv_files.append(test_suites)
             logger.info('get csv files: %s' % str(csv_files))
 
         full_test_cases = {}
@@ -153,18 +156,16 @@ class TestCaseParser:
                 return False
 
             with open(csv_file, 'rb') as csv_file_fh:
-                logger.info('[ParseFromCSV] real_csv_files: {0}'.format(csv_file))
+                logger.info('[parse_from_csv] real_csv_files: {0}'.format(csv_file))
 
                 csv_content = csv.reader(csv_file_fh, delimiter=',')
                 if csv_content:
                     case_classify = os.path.basename(csv_file)[:-4]
                     full_test_cases.update(self._extract_test_cases(case_classify, csv_content, csv_file))
                 else:
-                    logger.warning('[ParseFromCSV][{0}] is not a CSV file with comma'.format(csv_file))
+                    logger.warning('[parse_from_csv][{0}] is not a CSV file with comma'.format(csv_file))
 
-        logger.debug(str(full_test_cases))
-        print full_test_cases
-        print csv_files
+        logger.debug('[parse_from_csv] all test cases: {0}'.format(full_test_cases))
         return full_test_cases
 
 
