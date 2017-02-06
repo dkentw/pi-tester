@@ -2,7 +2,11 @@
 
 # Installation
 ```bash
-python setup.py install
+$ pip install pitester
+```
+
+```bash
+$ python setup.py install
 ```
 
 # Usage
