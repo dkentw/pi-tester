@@ -68,7 +68,7 @@ class Runner:
             }
         return True
 
-    def _replace_attribue_with_vaiablespool(self, obj):
+    def _replace_attribue_with_variablespool(self, obj):
         from Engine.config import VariablesPool
         for key in VariablesPool.__dict__.keys():
             if not re.match(r'_{2}', key):
@@ -86,7 +86,7 @@ class Runner:
             mod = import_module('{0}.{0}'.format(case_classify))
             mod_class = getattr(mod, case_id)
             mod_class_inst = mod_class()
-            self._replace_attribue_with_vaiablespool(mod_class_inst)
+            self._replace_attribue_with_variablespool(mod_class_inst)
             run_result, log_message = getattr(mod_class_inst, 'run')()
             logger.debug('Run test case: {0}.{1}'.format(case_classify, case_id))
             end_time = time.time()

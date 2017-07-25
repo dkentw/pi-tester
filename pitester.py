@@ -24,9 +24,9 @@ def parse_variable(variables):
         variable_list = variables.split(',')
 
         for vairable in variable_list:
-            vairable_pair = vairable.split(':')
-            variable_dict.update({vairable_pair[0]: vairable_pair[1]})
-            setattr(VariablesPool, vairable_pair[0], vairable_pair[1])
+            variable_pair = vairable.split(':')
+            variable_dict.update({variable_pair[0]: variable_pair[1]})
+            setattr(VariablesPool, variable_pair[0], variable_pair[1])
     else:
         raise Exception('The format of the string to variable is wrong.')
 
@@ -38,7 +38,7 @@ def main():
                       action='store',
                       type='string',
                       dest='debug_flag',
-                      help='Turn on the debug mode [debug|info|warning|error]. Ex: $python threat_tester.py -d debug -c Dummy')
+                      help='Turn on the debug mode [debug|info|warning|error]. Ex: $python pitester.py -d debug -c Dummy')
     parser.add_option('-c', '--caseid',
                       action='store',
                       type='string',
@@ -62,7 +62,7 @@ def main():
                       action='store',
                       type='string',
                       dest="csv_file_path",
-                      help="Generate the template of test scripts. Ex: $python threat_tester.py TestSuites/Dummy.csv")
+                      help="Generate the template of test scripts. Ex: $python pitester.py -g TestSuites/Dummy.csv")
     parser.add_option("-t", "--test",
                       action='store_true',
                       dest="test_flag",
