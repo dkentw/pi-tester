@@ -119,7 +119,7 @@ def main():
         # Tester.GenerateTestCase(testCaseSuites, caseList, csvFileList)
     elif options.run_all_flag:
         # -a
-        runner = TestEngine.Runner(['all'])
+        runner = TestEngine.Runner()
         runner.run_all()
     else:
         parser.print_help()
