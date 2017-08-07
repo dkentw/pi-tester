@@ -85,8 +85,8 @@ def main():
         # -d
         if options.debug_flag not in LOGGING_LEVELS.keys():
             raise Exception('Invalid log level.')
-        logLevel = LOGGING_LEVELS.get(options.debug_flag)
-        logging.basicConfig(format='[%(levelname)-6s][%(name)s]:%(message)s', level=logLevel)
+        log_level = LOGGING_LEVELS.get(options.debug_flag)
+        logging.basicConfig(format='[%(levelname)-6s][%(name)s]:%(message)s', level=log_level)
         logging.info("Turn on the debug mode!")
     else:
         logging.basicConfig(format='[%(levelname)-6s][%(name)s]:%(message)s', level=logging.WARN)
@@ -114,8 +114,8 @@ def main():
         testCaseSuites = parser.parse_from_csv([arg])
         TestEngine.GenerateTestCase(testCaseSuites)
     elif options.test_flag:
+        pass
         # -t
-        testCaseSuites, caseList, csvFileList = engine.ParseFromCSV()
         # Tester.GenerateTestCase(testCaseSuites, caseList, csvFileList)
     elif options.run_all_flag:
         # -a
