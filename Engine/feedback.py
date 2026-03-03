@@ -1,8 +1,8 @@
 import logging
 import traceback
 import json
-import urllib2
-import urllib
+import urllib.request
+import urllib.parse
 import socket
 
 logger = logging.getLogger('Feedback')
@@ -10,7 +10,7 @@ logger = logging.getLogger('Feedback')
 
 class Feedback:
     def __init__(self, task_id):
-        from config import FEEDBACK_SERVER
+        from Engine.config import FEEDBACK_SERVER
 
         self.task_id = task_id
         self.server_url = FEEDBACK_SERVER['server_url']
@@ -18,22 +18,21 @@ class Feedback:
         self.status_url = self.server_url + FEEDBACK_SERVER['status_path']
         self.hostname = socket.gethostname()
         try:
-            urllib2.urlopen(self.server_url, timeout=1)
+            urllib.request.urlopen(self.server_url, timeout=1)
             self.server_down = False
-        except:
-            logger.warn('It can not connect to feedback server!')
+        except Exception:
+            logger.warning('It can not connect to feedback server!')
             self.server_down = True
 
     def _notify_running(self):
         """statistic: [passed, failed, error, total_ran, run_time, run_status]
         """
         request = {"statistic": json.dumps([0, 0, 0, 0, 0, 1]), "hostname": self.hostname, "task_name": self.task_id}
-        encode_data = urllib.urlencode(request)
+        encode_data = urllib.parse.urlencode(request).encode('utf-8')
 
-        # data = 'dashboard={"hostname":"%s","statistic":[0,0,0,1]}' % self.hostname
         try:
-            response = urllib2.urlopen(self.status_url, encode_data)
-        except:
+            response = urllib.request.urlopen(self.status_url, encode_data)
+        except Exception:
             response = None
             logger.error('Network configuration may be wrong!')
             logger.error('Server url: %s' % self.status_url)
@@ -46,17 +45,15 @@ class Feedback:
         pass
 
     def _feedback_reports(self, test_result):
-        #data = 'data=\"%s\",hostname=\"%s\"' % (str(test_result), self.hostname)
-
-        request = { "data": json.dumps(test_result), "hostname": self.hostname, "task_id": self.task_id}
-        encode_data = urllib.urlencode(request)
+        request = {"data": json.dumps(test_result), "hostname": self.hostname, "task_id": self.task_id}
+        encode_data = urllib.parse.urlencode(request).encode('utf-8')
 
         logger.debug('url: %s' % self.reports_url)
         logger.debug('data: %s' % request)
 
         try:
-            response = urllib2.urlopen(self.reports_url, encode_data)
-        except:
+            response = urllib.request.urlopen(self.reports_url, encode_data)
+        except Exception:
             response = None
             logger.error(traceback.format_exc())
             logger.error('Network configuration may be wrong!')

@@ -9,6 +9,7 @@ import time
 import pprint
 import logging
 import csv
+import shutil
 
 from junit_xml import TestSuite, TestCase
 
@@ -54,8 +55,7 @@ class Reporter:
 
     def _create_html_table(self, test_result):
         table_body_content = ''
-        keys = test_result.keys()
-        keys.sort()
+        keys = sorted(test_result.keys())
         for case_id in keys:
             if test_result[case_id][0] == 'Fail':
                 table_body_content =  table_body_content + \
@@ -82,7 +82,7 @@ class Reporter:
         if not os.path.exists(self.latest_reports_dir):
             os.mkdir(self.latest_reports_dir)
 
-        with open(report_file_name, 'wb') as fh:
+        with open(report_file_name, 'w', encoding='utf-8') as fh:
             fh.write(content)
 
     def _generate_html_file(self, case_classify, test_result, test_summary):
@@ -97,7 +97,7 @@ class Reporter:
         <style>%s</style>
         <title>%s</title>
         %s
-    </htad>
+    </head>
     <body>
         <div id="main">
             <h1>%s</h1>
@@ -145,7 +145,7 @@ class Reporter:
         <style>%s</style>
         <title>Total Summary Result</title>
         %s
-    </htad>
+    </head>
     <body>
         <div id="main">
             <h1>Summary</h1>
@@ -158,7 +158,6 @@ class Reporter:
         self._create_report_file('SummaryReport', html_code)
 
     def _output_result_to_csv(self, test_result):
-        import shutil
         csv_content = []
         for case_classify in test_result.keys():
             csv_file_path = test_result[case_classify]['csv_file_path']
@@ -166,7 +165,7 @@ class Reporter:
             report_csv_file_path = os.path.join(self.latest_reports_dir, csv_file_path_basename)
             shutil.copy(csv_file_path, report_csv_file_path)
 
-            with open(report_csv_file_path, 'rb') as fh:
+            with open(report_csv_file_path, 'r', newline='', encoding='utf-8') as fh:
                 csv_content = [row for row in csv.reader(fh, delimiter=',') if len(row) > 0]
 
             for index, row in enumerate(csv_content):
@@ -177,13 +176,12 @@ class Reporter:
                         csv_content[index][6] = test_result[case_classify]['result'][case_id][1]
                         csv_content[index][7] = test_result[case_classify]['result'][case_id][2]
 
-            with open(report_csv_file_path, 'wb') as fh:
+            with open(report_csv_file_path, 'w', newline='', encoding='utf-8') as fh:
                 csv_writer = csv.writer(fh, delimiter=',')
                 try:
                     for row in csv_content:
                         csv_writer.writerow(row)
-                    os.remove(csv_file_path_backup)  # remove the backup if update csv success.
-                except:
+                except Exception:
                     logger.error('Output to csv file fail!')
 
     def _get_summary_dict(self, test_result):
@@ -200,7 +198,7 @@ class Reporter:
     def _output_normal(self, test_result):
         # Need refactor
         if test_result == {}:
-            print '[what?!] there are not any test result, what is the test case id?'
+            print('[what?!] there are not any test result, what is the test case id?')
         else:
             xml_test_suites = []
             summary_dict = self._get_summary_dict(test_result)
@@ -217,20 +215,20 @@ class Reporter:
                     self._output_result_to_csv(test_result)
 
                     # Show in Console
-                    print '{0} {1} {2}'.format('='*16, case_classify, '='*16)
+                    print('{0} {1} {2}'.format('='*16, case_classify, '='*16))
                     test_case_result = test_result[case_classify]['result']
                     for case_id in test_case_result.keys():
-                        print '[{0}][{1}] {2}, {3}, {4}'.format(case_classify, case_id,
+                        print('[{0}][{1}] {2}, {3}, {4}'.format(case_classify, case_id,
                                                                 test_case_result[case_id][0],
                                                                 test_case_result[case_id][1],
-                                                                str(test_case_result[case_id][2]))
+                                                                str(test_case_result[case_id][2])))
 
                         # Produce xml file
                         test_case = TestCase(case_id, case_classify, int(test_case_result[case_id][2]))
                         if test_case_result[case_id][0] == 'Fail' or test_case_result[case_id][0] == 'Error':
                             try:
                                 test_case.add_failure_info('msg' + test_case_result[case_id][1])
-                            except:
+                            except Exception:
                                 test_case.add_failure_info('msg' + str(test_case_result[case_id]))
 
                         xml_test_cases.append(test_case)
@@ -240,7 +238,7 @@ class Reporter:
                         TestSuite.to_file(f, xml_test_suites, prettyprint=True)
 
             self._generate_summary_html_file(summary_dict)
-            print '{0} {1} {2}'.format('='*16, 'Summary', '='*16)
+            print('{0} {1} {2}'.format('='*16, 'Summary', '='*16))
             pprint.pprint(summary_dict)
 
     def output_report(self, test_result):

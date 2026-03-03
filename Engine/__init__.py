@@ -1,12 +1,10 @@
-from parser import TestCaseParser
-def ParseFromCSV(testCaseSuite):
-    inst = TestCaseParser()
-    return inst.ParseFromCSV(testCaseSuite)
+from Engine.parser import TestCaseParser
+from Engine import TestEngine
 
-import TestEngine
-def GenerateTestCase(testCaseSuites, caseList, csvFileList):
-    return TestEngine.GenerateTestCase(testCaseSuites, caseList, csvFileList)
+
+def GenerateTestCase(testCaseSuites):
+    return TestEngine.GenerateTestCase(testCaseSuites)
 
 
 def run(caseid_prefix):
-    return TestEngine.run(caseid_prefix)
+    return TestEngine.Runner().run(caseid_prefix)

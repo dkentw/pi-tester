@@ -10,9 +10,9 @@ import traceback
 import time
 from importlib import import_module
 
-from parser import TestCaseParser
-from reporter import Reporter
-from feedback import Feedback
+from Engine.parser import TestCaseParser
+from Engine.reporter import Reporter
+from Engine.feedback import Feedback
 
 logger = logging.getLogger('TestEngine')
 
@@ -93,7 +93,7 @@ class Runner:
             run_time = end_time - start_time
             result = (run_result, log_message, int(run_time))
 
-        except:
+        except Exception:
             logger.error('[RUN] {0}.{1}'.format(case_classify, case_id))
             logger.error('working directory: {0}'.format(os.getcwd()))
             logger.error(traceback.format_exc())
@@ -110,7 +110,7 @@ class Runner:
         run_count = 0
         passed_num = 0
         failed_num = 0
-        specific_case_id = '\w' if specific_case_id == '' else specific_case_id
+        specific_case_id = r'\w' if specific_case_id == '' else specific_case_id
         self.feedback.feedback_to_server(self.test_result)  # this can initial feedback server.
 
         if self.test_suites is False:
@@ -135,7 +135,7 @@ class Runner:
                     run_count += 1
                     try:
                         run_result, log_message, run_time = self._invoke_test_case(case_id)
-                    except:
+                    except Exception:
                         logger.error(traceback.format_exc())
                         continue
 
@@ -159,7 +159,7 @@ class Runner:
 
         try:
             self.feedback.feedback_to_server(self.test_result)
-        except:
+        except Exception:
             logger.error(traceback.format_exc())
             logger.error('Please check the server configuration!')
 

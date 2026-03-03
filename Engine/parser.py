@@ -63,11 +63,11 @@ class TestCaseParser:
         :param fh csv_file_fh: file handle of csv
         '''
         try:
-            with open(csv_file, 'rb') as csv_file_fh:
+            with open(csv_file, 'r', newline='', encoding='utf-8') as csv_file_fh:
                 try:
                     CSVSniffer = csv.Sniffer()
                     DiaObject = CSVSniffer.sniff(csv_file_fh.readline())  # this will flush the buffer of csv content
-                except:
+                except Exception:
                     logger.error('[VerifyCSVFormat] [%s] CSVSniffer fail, is this a csv?' % csv_file)
                     csv_file_fh.close()
                     sys.exit(0)
@@ -85,7 +85,7 @@ class TestCaseParser:
             logger.error(traceback.print_exc())
             logger.error('Fail to open file!')
             return False
-        except:
+        except Exception:
             logger.error(traceback.format_exc())
             return False
 
@@ -155,7 +155,7 @@ class TestCaseParser:
             if not self._verify_csv_format(csv_file):
                 return False
 
-            with open(csv_file, 'rb') as csv_file_fh:
+            with open(csv_file, 'r', newline='', encoding='utf-8') as csv_file_fh:
                 logger.info('[parse_from_csv] real_csv_files: {0}'.format(csv_file))
 
                 csv_content = csv.reader(csv_file_fh, delimiter=',')

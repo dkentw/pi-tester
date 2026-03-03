@@ -13,9 +13,9 @@ __VERSION__ = '1.0.1'
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('Agent')
-from optparse import OptionParser
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import argparse
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 import socket
 import subprocess
 from subprocess import PIPE
@@ -61,7 +61,7 @@ def receive_file(data, filename, path):
         
         logger.info('[receive_file]: %s, path:%s' % (filename, path))
         return True
-    except:
+    except Exception:
         logger.error('[receive_file]: %s, path:%s, failed!' % (filename, path))
         return False
 
@@ -75,8 +75,8 @@ def create_server(server_ip, port):
     server_ip = socket.gethostbyname(socket.gethostname())
     server = SimpleXMLRPCServer((server_ip, int(port)), requestHandler=RequestHandler)
     server.register_introspection_functions()
-    print "[INFO] The server IP is: " + server_ip
-    print "[INFO] The server Port is: " + port
+    print("[INFO] The server IP is: " + server_ip)
+    print("[INFO] The server Port is: " + port)
 
     # register function
     server.register_function(exec_command_async, 'exec_command_async')
@@ -89,29 +89,23 @@ def create_server(server_ip, port):
 
 
 def main():
-    usage = "usage: %prog [options] arg1"
-    parser = OptionParser(usage="usage: %prog [options][arg]")
-    parser.add_option('-s', '--server',
-                      action='store', 
-                      type='string', 
-                      dest='server_ip',
-                      default='localhost',
-                      help='Setup the server ip.')
+    parser = argparse.ArgumentParser(usage="%(prog)s [options][arg]")
+    parser.add_argument('-s', '--server',
+                        dest='server_ip',
+                        default='localhost',
+                        help='Setup the server ip.')
+    parser.add_argument('-p', '--port',
+                        dest='port',
+                        default='8000',
+                        help='Setup the port of server. Default is 8000.')
+    options = parser.parse_args()
 
-    parser.add_option('-p', '--port',
-                      action='store', 
-                      type='string', 
-                      dest='port',
-                      default='8000',
-                      help='Setup the port of server. Default is 8000.')
-    (options, args) = parser.parse_args()
-    
     create_server(options.server_ip, options.port)
 
 if __name__ == '__main__':
-    print "[INFO] Agent version is %s" % __VERSION__
-    print "[INFO] Start the Agent Mode...(Ctrl-C for exit)"
+    print("[INFO] Agent version is %s" % __VERSION__)
+    print("[INFO] Start the Agent Mode...(Ctrl-C for exit)")
     try:
         main()
-    except:
-        print 'Bye!Bye!'
+    except Exception:
+        print('Bye!Bye!')
