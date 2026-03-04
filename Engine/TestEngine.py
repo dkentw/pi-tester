@@ -42,6 +42,7 @@ class Runner:
             run_result = 'Error'
             failed_num += 1
         elif run_result is False:
+            run_result = 'Fail'
             failed_num += 1
         else:
             # this include "not run" case
@@ -215,9 +216,8 @@ def GenerateTestCase(test_suites):
                 logger.error('canot make dir {0}'.format(script_filename_path))
                 pass
 
-            fh = open(os.path.join(test_cases_dir['layer2'], '__init__.py'), 'w')
-            logger.info('[GenerateTestCase] create file {0}'.format(init_file))
-            fh.close()
+            with open(os.path.join(test_cases_dir['layer2'], '__init__.py'), 'w'):
+                logger.info('[GenerateTestCase] create file {0}'.format(init_file))
 
             _write_template(script_filename_path, test_suites[case_classify]['ordered_cases'])
         else:

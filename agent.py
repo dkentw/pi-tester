@@ -72,7 +72,6 @@ def ping():
 
 #-----------------------------------------------------------
 def create_server(server_ip, port):
-    server_ip = socket.gethostbyname(socket.gethostname())
     server = SimpleXMLRPCServer((server_ip, int(port)), requestHandler=RequestHandler)
     server.register_introspection_functions()
     print("[INFO] The server IP is: " + server_ip)

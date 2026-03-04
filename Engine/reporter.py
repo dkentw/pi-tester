@@ -171,7 +171,7 @@ class Reporter:
             for index, row in enumerate(csv_content):
                 if index != 0:
                     case_id = csv_content[index][1]
-                    if case_id in test_result[case_classify]['result'].keys():
+                    if case_id in test_result[case_classify]['result'].keys() and len(csv_content[index]) >= 8:
                         csv_content[index][5] = test_result[case_classify]['result'][case_id][0]
                         csv_content[index][6] = test_result[case_classify]['result'][case_id][1]
                         csv_content[index][7] = test_result[case_classify]['result'][case_id][2]
@@ -200,10 +200,10 @@ class Reporter:
         if test_result == {}:
             print('[what?!] there are not any test result, what is the test case id?')
         else:
-            xml_test_suites = []
             summary_dict = self._get_summary_dict(test_result)
             self.report_create_time = str(time.strftime('%Y%m%d_%H%M%S', time.localtime()))
             for case_classify in test_result.keys():
+                xml_test_suites = []
                 xml_test_cases = []
                 if 'result' in test_result[case_classify].keys():
                     # Generate HTML report

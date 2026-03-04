@@ -23,7 +23,7 @@ def get_csv_files():
     def find_csv_files(working_dir):
         item_list = os.listdir(working_dir)
         for item in item_list:
-            if os.path.isdir(item):
+            if os.path.isdir(os.path.join(working_dir, item)):
                 child_dir = os.path.join(working_dir, item)
                 find_csv_files(child_dir)
             elif item[-3:] == 'csv':
