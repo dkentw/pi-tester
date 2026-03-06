@@ -132,7 +132,7 @@ class Reporter:
 
         html_table = ' \
             <table class="table table-hover"> \
-            <thead><tr><th>Classify<th>Pass</th><th>Fail</th><th>Ran Cases</th></tr></thead> %s \
+            <thead><tr><th>Classify</th><th>Pass</th><th>Fail</th><th>Ran Cases</th></tr></thead> %s \
             <tfoot><tr><td>Total</td><td>%s</td><td>%s</td><td>%s</td></tr></tfoot> \
             </table>' % (summary_table, str(total_pass), str(total_fail), str(total_ran))
 

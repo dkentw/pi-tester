@@ -98,8 +98,8 @@ def main():
     elif options.csv_file_path:
         # -g
         arg = options.csv_file_path
-        parser = Parser.TestCaseParser()
-        testCaseSuites = parser.parse_from_csv([arg])
+        csv_parser = Parser.TestCaseParser()
+        testCaseSuites = csv_parser.parse_from_csv([arg])
         TestEngine.GenerateTestCase(testCaseSuites)
     elif options.test_flag:
         pass

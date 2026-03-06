@@ -115,7 +115,7 @@ class TestCaseParser:
             if csv_content.line_num == 1:  # skip title
                 continue
 
-            if len(row) > 0:
+            if len(row) >= 5:
                 case_id = row[1]
                 case_run = row[4]
                 test_suites[case_classify].update({case_id: {'run': case_run}})

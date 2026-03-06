@@ -91,7 +91,7 @@ def main():
     parser = argparse.ArgumentParser(usage="%(prog)s [options][arg]")
     parser.add_argument('-s', '--server',
                         dest='server_ip',
-                        default='localhost',
+                        default=socket.gethostbyname(socket.gethostname()),
                         help='Setup the server ip.')
     parser.add_argument('-p', '--port',
                         dest='port',
