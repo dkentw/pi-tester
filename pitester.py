@@ -19,7 +19,7 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
 
 
 def parse_variable(variables):
-    if re.fullmatch(r'\w+:\w+(,\w+:\w+)*', variables):
+    if re.fullmatch(r'\w+:[^,]+(,\w+:[^,]+)*', variables):
         variable_dict = {}
         variable_list = variables.split(',')
 
