@@ -84,7 +84,7 @@ class Runner:
         try:
             case_classify = case_id.split('_')[0]
             # mod = __import__('{0}.{0}'.format(case_classify), fromlist=[case_id])
-            mod = import_module('{0}.{0}'.format(case_classify))
+            mod = import_module('test.{0}.{0}'.format(case_classify))
             mod_class = getattr(mod, case_id)
             mod_class_inst = mod_class()
             self._replace_attribue_with_variablespool(mod_class_inst)
